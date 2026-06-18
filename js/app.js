@@ -196,7 +196,7 @@ function renderProductPage(search) {
     '    </div>',
     '  </div>',
     '</section>',
-    renderRecommendationCarousel('rec-pdp-related', 'related', related, 'You May Also Like'),
+    renderRecsPlaceholder('rec-pdp-related', 'related', 'You May Also Like'),
   ].join('\n');
 
   setActivePage();
@@ -268,9 +268,6 @@ function renderCartPage() {
     ? '<p class="free-ship-nudge">Add $' + (75 - total).toFixed(2) + ' more for free shipping!</p>'
     : '';
 
-  var bundleProducts = GU_PRODUCTS.filter(function (p) {
-    return !cart.find(function (c) { return c.productId === p.id; });
-  }).slice(0, 6);
 
   content.innerHTML = [
     '<div class="page-header">',
@@ -303,7 +300,7 @@ function renderCartPage() {
     '    </div>',
     '  </div>',
     '</section>',
-    renderRecommendationCarousel('rec-cart-bundle', 'frequently-bought-together', bundleProducts, 'Frequently Bought Together'),
+    renderRecsPlaceholder('rec-cart-bundle', 'frequently-bought-together', 'Frequently Bought Together'),
   ].join('\n');
 
   setActivePage();

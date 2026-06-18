@@ -119,6 +119,21 @@ function renderProductCard(product) {
 }
 
 // ---------------------------------------------------------------------------
+// RecsPlaceholder — empty slot for Adobe Target Recs activities to populate
+// ---------------------------------------------------------------------------
+function renderRecsPlaceholder(id, criteria, heading) {
+  return [
+    '<section class="rec-carousel-section">',
+    '  <div class="container">',
+    '    <h2 class="section-heading">' + heading + '</h2>',
+    '    <div class="rec-carousel" id="' + id + '" data-criteria="' + criteria + '" role="list">',
+    '    </div>',
+    '  </div>',
+    '</section>',
+  ].join('\n');
+}
+
+// ---------------------------------------------------------------------------
 // RecommendationCarousel — stable id + data-criteria for Adobe Target Recs
 // ---------------------------------------------------------------------------
 function renderRecommendationCarousel(id, criteria, products, heading) {
