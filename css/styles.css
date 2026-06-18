@@ -378,6 +378,37 @@ ul, ol { list-style: none; }
 .rec-carousel::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 4px; }
 .carousel-item { flex: 0 0 260px; scroll-snap-align: start; }
 
+.recs-placeholder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 160px;
+  border: 2px dashed var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  color: var(--c-text-muted);
+  text-align: center;
+}
+.recs-placeholder-card svg { opacity: .4; }
+.recs-placeholder-card p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--c-text-muted);
+}
+.recs-placeholder-card span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  background: #fef2f0;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
 /* 12. Shop filter */
 .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
 .filter-btn {
