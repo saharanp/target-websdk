@@ -1,0 +1,130 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f5f5;
+  color: #1a1a1a;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* Header */
+.site-header {
+  background: #1473e6;
+  color: #fff;
+  padding: 1.5rem 0;
+}
+
+.site-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.site-header .subtitle {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* Hero */
+.hero {
+  background: #fff;
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  margin: 2rem 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.hero-title {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero-body {
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  display: inline-block;
+  background: #1473e6;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.65rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #0d66d0;
+}
+
+/* Offer cards */
+.offers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.offer-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.offer-card h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #1473e6;
+}
+
+.offer-card p {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* SDK status panel */
+.sdk-status {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sdk-status h4 {
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+}
+
+#sdk-log {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.8rem;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Footer */
+.site-footer {
+  background: #e8e8e8;
+  padding: 1rem 0;
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+}

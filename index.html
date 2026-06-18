@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Target Web SDK Demo</title>
+
+  <!-- Adobe Target Web SDK will be loaded here -->
+  <!-- <script src="https://cdn1.adoberesources.net/alloy/latest/alloy.min.js"></script> -->
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <h1>Adobe Target Web SDK</h1>
+      <p class="subtitle">Demo landing page</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Hero — good candidate for an A/B test offer -->
+    <section class="hero" id="hero">
+      <h2 class="hero-title">Welcome to the Demo</h2>
+      <p class="hero-body">This content can be personalized via Adobe Target.</p>
+      <a class="btn" href="#" id="hero-cta">Get Started</a>
+    </section>
+
+    <!-- Offers container — Target will inject JSON offers here -->
+    <section class="offers" id="target-offers">
+      <div class="offer-card" id="offer-1">
+        <h3>Offer 1</h3>
+        <p>Default content — replaced by Target if an activity is active.</p>
+      </div>
+      <div class="offer-card" id="offer-2">
+        <h3>Offer 2</h3>
+        <p>Default content — replaced by Target if an activity is active.</p>
+      </div>
+    </section>
+
+    <!-- Status panel for SDK events (useful during development) -->
+    <section class="sdk-status" id="sdk-status">
+      <h4>SDK Status</h4>
+      <pre id="sdk-log">Web SDK not yet initialised.</pre>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Target Web SDK Demo</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
