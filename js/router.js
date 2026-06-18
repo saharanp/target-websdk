@@ -39,6 +39,8 @@ const Router = (() => {
       const href = link.getAttribute('href');
       if (href) navigate(href);
     });
+
+    resolve();
   }
 
   return { register, navigate, init };
