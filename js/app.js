@@ -1,7 +1,23 @@
 // ---------------------------------------------------------------------------
-// Cart state (in-memory only — no localStorage)
+// Cart state — persisted to localStorage so it survives page reloads
 // ---------------------------------------------------------------------------
-var cart = [];
+var CART_KEY = 'gu_cart';
+
+function loadCart() {
+  try {
+    return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveCart() {
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  } catch (e) {}
+}
+
+var cart = loadCart();
 
 function getCartCount() {
   return cart.reduce(function (sum, item) { return sum + item.quantity; }, 0);
@@ -21,12 +37,14 @@ function addToCart(productId) {
   } else {
     cart.push({ productId: productId, quantity: 1 });
   }
+  saveCart();
   refreshNavbar();
   showToast('Item added to cart!');
 }
 
 function removeFromCart(productId) {
   cart = cart.filter(function (i) { return i.productId !== productId; });
+  saveCart();
   refreshNavbar();
   if (window.location.pathname === '/cart') renderCartPage('');
 }
@@ -35,6 +53,7 @@ function updateCartQty(productId, delta) {
   var item = cart.find(function (i) { return i.productId === productId; });
   if (!item) return;
   item.quantity = Math.max(1, item.quantity + delta);
+  saveCart();
   refreshNavbar();
   if (window.location.pathname === '/cart') renderCartPage('');
 }
