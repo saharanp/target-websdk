@@ -535,7 +535,7 @@ var App = {
 // ---------------------------------------------------------------------------
 function init() {
   document.getElementById('navbar-container').innerHTML = renderNavbar(getCartCount(), currentUser);
-  document.getElementById('target-promo').innerHTML     = renderPromoStrip();
+  // #target-promo is left intentionally empty — Adobe Target populates it.
   document.getElementById('footer-container').innerHTML = renderFooter();
 
   var page  = document.body.dataset.page;
