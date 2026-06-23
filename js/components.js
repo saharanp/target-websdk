@@ -3,11 +3,11 @@
 // ---------------------------------------------------------------------------
 function renderNavbar(cartCount, currentUser) {
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/shop', label: 'Shop' },
-    { href: '/about', label: 'About' },
+    { href: '/',           label: 'Home' },
+    { href: '/shop.html',  label: 'Shop' },
+    { href: '/about.html', label: 'About' },
   ].map(function (l) {
-    return '<a href="' + l.href + '" class="nav-link" data-link>' + l.label + '</a>';
+    return '<a href="' + l.href + '" class="nav-link">' + l.label + '</a>';
   }).join('');
 
   const badge = cartCount > 0
@@ -21,22 +21,22 @@ function renderNavbar(cartCount, currentUser) {
         '<span class="nav-user">Hi, <strong>' + currentUser + '</strong></span>',
         '<button class="nav-auth-btn" onclick="App.signOut()">Sign Out</button>',
       ].join('')
-    : '<a href="/login" class="nav-auth-btn" data-link>Sign In</a>';
+    : '<a href="/login.html" class="nav-auth-btn">Sign In</a>';
 
   var mobileAuthBlock = currentUser
     ? '<a href="#" class="nav-link" onclick="App.signOut();return false;">Sign Out (' + currentUser + ')</a>'
-    : '<a href="/login" class="nav-link" data-link>Sign In</a>';
+    : '<a href="/login.html" class="nav-link">Sign In</a>';
 
   return [
     '<nav class="navbar">',
     '  <div class="navbar-inner container">',
-    '    <a href="/" class="nav-brand" data-link>',
+    '    <a href="/" class="nav-brand">',
     '      <span class="brand-icon">&#9889;</span>',
     '      GearUp <span class="brand-accent">Velocity</span>',
     '    </a>',
     '    <div class="nav-links">' + navLinks + '</div>',
     '    <div class="nav-auth">' + authBlock + '</div>',
-    '    <a href="/cart" class="nav-cart" data-link aria-label="View cart">',
+    '    <a href="/cart.html" class="nav-cart" aria-label="View cart">',
     '      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">',
     '        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>',
     '        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
@@ -49,7 +49,7 @@ function renderNavbar(cartCount, currentUser) {
     '  </div>',
     '  <div class="nav-mobile-menu" id="mobile-menu">',
     '    ' + navLinks,
-    '    <a href="/cart" class="nav-link" data-link>' + mobileCartLabel + '</a>',
+    '    <a href="/cart.html" class="nav-link">' + mobileCartLabel + '</a>',
     '    ' + mobileAuthBlock,
     '  </div>',
     '</nav>',
@@ -63,7 +63,7 @@ function renderFooter() {
   return [
     '<div class="footer-inner container">',
     '  <div class="footer-brand">',
-    '    <a href="/" class="nav-brand" data-link>',
+    '    <a href="/" class="nav-brand">',
     '      <span class="brand-icon">&#9889;</span>',
     '      GearUp <span class="brand-accent">Velocity</span>',
     '    </a>',
@@ -72,23 +72,23 @@ function renderFooter() {
     '  <div class="footer-links">',
     '    <div class="footer-col">',
     '      <h4>Shop</h4>',
-    '      <a href="/shop" data-link>All Products</a>',
-    '      <a href="/shop?cat=Running" data-link>Running</a>',
-    '      <a href="/shop?cat=Training" data-link>Training</a>',
-    '      <a href="/shop?cat=Football" data-link>Football</a>',
-    '      <a href="/shop?cat=Accessories" data-link>Accessories</a>',
+    '      <a href="/shop.html">All Products</a>',
+    '      <a href="/shop.html?cat=Running">Running</a>',
+    '      <a href="/shop.html?cat=Training">Training</a>',
+    '      <a href="/shop.html?cat=Football">Football</a>',
+    '      <a href="/shop.html?cat=Accessories">Accessories</a>',
     '    </div>',
     '    <div class="footer-col">',
     '      <h4>Company</h4>',
-    '      <a href="/about" data-link>About Us</a>',
-    '      <a href="/about" data-link>Careers</a>',
-    '      <a href="/about" data-link>Press</a>',
+    '      <a href="/about.html">About Us</a>',
+    '      <a href="/about.html">Careers</a>',
+    '      <a href="/about.html">Press</a>',
     '    </div>',
     '    <div class="footer-col">',
     '      <h4>Support</h4>',
-    '      <a href="/about" data-link>Contact</a>',
-    '      <a href="/about" data-link>Returns</a>',
-    '      <a href="/about" data-link>Sizing Guide</a>',
+    '      <a href="/about.html">Contact</a>',
+    '      <a href="/about.html">Returns</a>',
+    '      <a href="/about.html">Sizing Guide</a>',
     '    </div>',
     '  </div>',
     '</div>',
@@ -114,13 +114,13 @@ function renderPromoStrip(message) {
 function renderProductCard(product) {
   return [
     '<article class="product-card" data-product-id="' + product.id + '">',
-    '  <a href="/product?id=' + product.id + '" class="product-card-img-wrap" data-link>',
+    '  <a href="/product.html?id=' + product.id + '" class="product-card-img-wrap">',
     '    <img src="' + product.image + '" alt="' + product.name + '" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/600x600/0d1b2a/ffffff?text=' + encodeURIComponent(product.category) + '\'" />',
     '    <span class="product-card-category">' + product.category + '</span>',
     '  </a>',
     '  <div class="product-card-body">',
     '    <h3 class="product-card-name">',
-    '      <a href="/product?id=' + product.id + '" data-link>' + product.name + '</a>',
+    '      <a href="/product.html?id=' + product.id + '">' + product.name + '</a>',
     '    </h3>',
     '    <div class="product-card-footer">',
     '      <span class="product-price">$' + product.price.toFixed(2) + '</span>',
@@ -185,8 +185,8 @@ function renderHeroBanner(headline, subline, ctaText, ctaHref) {
     '      <h1 class="hero-headline">' + headline + '</h1>',
     '      <p class="hero-subline">' + subline + '</p>',
     '      <div class="hero-cta-group">',
-    '        <a href="' + ctaHref + '" class="btn btn-lg btn-accent" data-link>' + ctaText + '</a>',
-    '        <a href="/about" class="btn btn-lg btn-outline-light" data-link>Our Story</a>',
+    '        <a href="' + ctaHref + '" class="btn btn-lg btn-accent">' + ctaText + '</a>',
+    '        <a href="/about.html" class="btn btn-lg btn-outline-light">Our Story</a>',
     '      </div>',
     '    </div>',
     '    <div class="hero-image">',
@@ -207,15 +207,15 @@ function renderHeroBanner(headline, subline, ctaText, ctaHref) {
 // ---------------------------------------------------------------------------
 function renderCategoryGrid() {
   var categories = [
-    { name: 'Running',     icon: '&#127939;', color: '#1a237e', href: '/shop?cat=Running' },
-    { name: 'Training',    icon: '&#127947;', color: '#1b5e20', href: '/shop?cat=Training' },
-    { name: 'Football',    icon: '&#127944;', color: '#b71c1c', href: '/shop?cat=Football' },
-    { name: 'Accessories', icon: '&#127890;', color: '#37474f', href: '/shop?cat=Accessories' },
+    { name: 'Running',     icon: '&#127939;', color: '#1a237e', href: '/shop.html?cat=Running' },
+    { name: 'Training',    icon: '&#127947;', color: '#1b5e20', href: '/shop.html?cat=Training' },
+    { name: 'Football',    icon: '&#127944;', color: '#b71c1c', href: '/shop.html?cat=Football' },
+    { name: 'Accessories', icon: '&#127890;', color: '#37474f', href: '/shop.html?cat=Accessories' },
   ];
 
   var cards = categories.map(function (cat) {
     return [
-      '<a href="' + cat.href + '" class="category-card" data-link style="--cat-color:' + cat.color + '">',
+      '<a href="' + cat.href + '" class="category-card" style="--cat-color:' + cat.color + '">',
       '  <span class="category-icon">' + cat.icon + '</span>',
       '  <span class="category-name">' + cat.name + '</span>',
       '</a>',
