@@ -50,13 +50,11 @@ function signOut() {
   currentUser = null;
   currentPref = null;
   saveUser(null);
-  refreshNavbar();
-  showToast('Signed out');
-  // User state must update before the page event so the next pageView reflects
-  // guest context.
+  // User state + event fire on the current page; the next page's own
+  // bootstrap will fire a fresh pushUser/pushPage in guest context.
   DL.pushUser();
   DL.pushEvent('userLoggedOut', { username: prev });
-  Router.navigate('/');
+  window.location.href = '/';
 }
 
 // ---------------------------------------------------------------------------
@@ -109,7 +107,7 @@ function removeFromCart(productId) {
   cart = cart.filter(function (i) { return i.productId !== productId; });
   saveCart();
   refreshNavbar();
-  if (window.location.pathname === '/cart') renderCartPage('');
+  if (document.body.dataset.page === 'cart') renderCartPage();
   DL.pushCart();
   DL.pushEvent('cartUpdate', { removed: productId });
 }
@@ -120,7 +118,7 @@ function updateCartQty(productId, delta) {
   item.quantity = Math.max(1, item.quantity + delta);
   saveCart();
   refreshNavbar();
-  if (window.location.pathname === '/cart') renderCartPage('');
+  if (document.body.dataset.page === 'cart') renderCartPage();
   DL.pushCart();
   DL.pushEvent('cartUpdate', { productId: productId, quantity: item.quantity });
 }
@@ -135,6 +133,7 @@ function refreshNavbar() {
 
 function setActivePage() {
   var path = window.location.pathname;
+  if (path === '/index.html') path = '/';
   document.querySelectorAll('.nav-link').forEach(function (link) {
     link.classList.toggle('active', link.getAttribute('href') === path);
   });
@@ -209,7 +208,8 @@ function renderShopView(activeFilter) {
   var filterButtons = categories.map(function (cat) {
     var label = cat === 'all' ? 'All Products' : cat;
     var cls   = cat === activeFilter ? 'filter-btn active' : 'filter-btn';
-    return '<button class="' + cls + '" onclick="App.filterShop(\'' + cat + '\')">' + label + '</button>';
+    var href  = cat === 'all' ? '/shop.html' : '/shop.html?cat=' + encodeURIComponent(cat);
+    return '<a href="' + href + '" class="' + cls + '">' + label + '</a>';
   }).join('');
 
   var grid = filtered.length
@@ -248,7 +248,7 @@ function renderProductPage(search) {
       '  <div class="empty-state">',
       '    <h2>Product not found</h2>',
       '    <p>We couldn\'t find that product. It may have been removed.</p>',
-      '    <a href="/shop" class="btn btn-accent" data-link>Back to Shop</a>',
+      '    <a href="/shop.html" class="btn btn-accent">Back to Shop</a>',
       '  </div>',
       '</div>',
     ].join('\n');
@@ -276,7 +276,7 @@ function renderProductPage(search) {
     '        <p class="product-detail-desc">' + product.description + '</p>',
     '        <div class="product-detail-actions">',
     '          <button class="btn btn-lg btn-accent" onclick="App.addToCart(' + product.id + ')">Add to Cart</button>',
-    '          <a href="/shop" class="btn btn-lg btn-outline" data-link>Continue Shopping</a>',
+    '          <a href="/shop.html" class="btn btn-lg btn-outline">Continue Shopping</a>',
     '        </div>',
     '      </div>',
     '    </div>',
@@ -304,7 +304,7 @@ function renderCartPage() {
       '    </svg>',
       '    <h2>Your cart is empty</h2>',
       '    <p>You haven\'t added anything yet. Browse the store and find your next edge.</p>',
-      '    <a href="/shop" class="btn btn-accent" data-link>Start Shopping</a>',
+      '    <a href="/shop.html" class="btn btn-accent">Start Shopping</a>',
       '  </div>',
       '</div>',
     ].join('\n');
@@ -321,7 +321,7 @@ function renderCartPage() {
       '    <div class="cart-product-cell">',
       '      <img src="' + product.image + '" alt="' + product.name + '" class="cart-item-img" onerror="this.onerror=null;this.src=\'https://placehold.co/150x150/0d1b2a/ffffff?text=' + encodeURIComponent(product.category) + '\'" />',
       '      <div class="cart-item-info">',
-      '        <a href="/product?id=' + product.id + '" class="cart-item-name" data-link>' + product.name + '</a>',
+      '        <a href="/product.html?id=' + product.id + '" class="cart-item-name">' + product.name + '</a>',
       '        <span class="cart-item-cat">' + product.category + '</span>',
       '      </div>',
       '    </div>',
@@ -479,7 +479,6 @@ var App = {
   addToCart:       function (id)            { addToCart(id); },
   removeFromCart:  function (id)            { removeFromCart(id); },
   updateCartQty:   function (id, delta)     { updateCartQty(id, delta); },
-  filterShop:      function (category)      { renderShopView(category); },
   showCheckoutMsg: function ()              {
     DL.pushEvent('checkoutIntent', { value: getCartTotal(), itemCount: getCartCount() });
     showToast('Checkout coming soon! This is a demo site.');
@@ -499,13 +498,12 @@ var App = {
       return false;
     }
     if (err) err.style.display = 'none';
-    refreshNavbar();
-    showToast('Welcome, ' + currentUser + '!');
-    // User state first; then the userLoggedIn event; then a fresh pageView so
-    // personalization re-evaluates with the new preference.
+    // Push user state + userLoggedIn on the current page, then real-navigate
+    // home — that page's bootstrap will fire a fresh pageView in authenticated
+    // context.
     DL.pushUser();
     DL.pushEvent('userLoggedIn', { username: currentUser, preference: currentPref });
-    Router.navigate('/');
+    window.location.href = '/';
     return false;
   },
   toggleMenu: function () {
@@ -517,23 +515,56 @@ var App = {
 // ---------------------------------------------------------------------------
 // Bootstrap
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// MPA bootstrap — each HTML page sets <body data-page="..."> and we dispatch
+// from there. Order matters for the data layer:
+//   1. Render layout chrome (navbar, promo strip, footer) from localStorage.
+//   2. Render the page's main content.
+//   3. push user, push cart, (push product:null on non-product pages),
+//      push pageView with the page's canonical name + any extras.
+// ---------------------------------------------------------------------------
 function init() {
   document.getElementById('navbar-container').innerHTML = renderNavbar(getCartCount(), currentUser);
   document.getElementById('target-promo').innerHTML     = renderPromoStrip();
   document.getElementById('footer-container').innerHTML = renderFooter();
 
-  Router.register('/',        renderHomePage);
-  Router.register('/shop',    renderShopPage);
-  Router.register('/product', renderProductPage);
-  Router.register('/cart',    renderCartPage);
-  Router.register('/about',   renderAboutPage);
-  Router.register('/login',   renderLoginPage);
+  var page  = document.body.dataset.page;
+  var extra = null;
 
-  // Seed user + cart context BEFORE Router.init() fires the first pageView so
-  // the first personalization request carries login/preference state.
+  if (page === 'home') {
+    renderHomePage();
+  } else if (page === 'shop') {
+    renderShopPage(window.location.search);
+    var cat = new URLSearchParams(window.location.search).get('cat') || 'All';
+    extra = { page: { category: cat } };
+  } else if (page === 'product') {
+    renderProductPage(window.location.search);
+    var pid = parseInt(new URLSearchParams(window.location.search).get('id'), 10);
+    var prod = GU_PRODUCTS.find(function (p) { return p.id === pid; });
+    if (prod) {
+      extra = {
+        product: { id: prod.id, name: prod.name, category: prod.category, price: prod.price },
+        page:    { category: prod.category }
+      };
+    }
+  } else if (page === 'cart') {
+    renderCartPage();
+  } else if (page === 'about') {
+    renderAboutPage();
+  } else if (page === 'login') {
+    renderLoginPage();
+  } else {
+    return;
+  }
+
   DL.pushUser();
   DL.pushCart();
-  Router.init();
+  if (page !== 'product') {
+    // Hygiene: clear product branch on non-product pages so it doesn't leak
+    // into rules that read merged ACDL state.
+    window.adobeDataLayer.push({ product: null });
+  }
+  DL.pushPage(page, extra);
 }
 
 document.addEventListener('DOMContentLoaded', init);

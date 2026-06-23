@@ -1,22 +1,16 @@
 // ---------------------------------------------------------------------------
 // Adobe Client Data Layer (ACDL) — event-driven push helpers.
 //
-// The runtime is provided by the ACDL extension in Launch. This file does NOT
-// implement ACDL; it only pushes plain objects onto window.adobeDataLayer.
-// ES5-safe: var, function expressions, no template literals.
+// In MPA mode, each page is a real document. Each page's bootstrap pushes:
+//   DL.pushUser()  -> DL.pushCart()  ->  DL.pushPage(name, extra)
+// On non-product pages it also pushes { product: null } so the product branch
+// is explicitly cleared in the merged ACDL state.
+//
+// The runtime is provided by the ACDL extension in Launch. This file only
+// pushes plain objects onto window.adobeDataLayer. ES5-safe.
 // ---------------------------------------------------------------------------
 (function () {
   window.adobeDataLayer = window.adobeDataLayer || [];
-
-  // Path → canonical page.name (this is the SPA viewName source for Target).
-  var ROUTE_NAMES = {
-    '/':        'home',
-    '/shop':    'shop',
-    '/product': 'product',
-    '/cart':    'cart',
-    '/about':   'about',
-    '/login':   'login'
-  };
 
   function readUser() {
     try { return localStorage.getItem('gu_user') || null; } catch (e) { return null; }
@@ -26,32 +20,6 @@
   }
   function readCart() {
     try { return JSON.parse(localStorage.getItem('gu_cart')) || []; } catch (e) { return []; }
-  }
-
-  function nameForPath(path) {
-    return ROUTE_NAMES[path] || 'unknown';
-  }
-
-  function extraForPath(path, search) {
-    var params = new URLSearchParams(search || '');
-    if (path === '/shop') {
-      return { page: { category: params.get('cat') || 'All' } };
-    }
-    if (path === '/product') {
-      var id = parseInt(params.get('id'), 10);
-      var products = window.GU_PRODUCTS || [];
-      var match = null;
-      for (var i = 0; i < products.length; i++) {
-        if (products[i].id === id) { match = products[i]; break; }
-      }
-      if (match) {
-        return {
-          product: { id: match.id, name: match.name, category: match.category, price: match.price },
-          page:    { category: match.category }
-        };
-      }
-    }
-    return null;
   }
 
   function cartSummary() {
@@ -80,6 +48,10 @@
     });
   }
 
+  function pushCart() {
+    window.adobeDataLayer.push({ cart: cartSummary() });
+  }
+
   function pushPage(name, extra) {
     var payload = {
       event: 'pageView',
@@ -97,10 +69,6 @@
     window.adobeDataLayer.push(payload);
   }
 
-  function pushCart() {
-    window.adobeDataLayer.push({ cart: cartSummary() });
-  }
-
   function pushEvent(name, payload) {
     var obj = { event: name };
     if (payload) {
@@ -112,11 +80,9 @@
   }
 
   window.DL = {
-    pushUser:     pushUser,
-    pushPage:     pushPage,
-    pushCart:     pushCart,
-    pushEvent:    pushEvent,
-    nameForPath:  nameForPath,
-    extraForPath: extraForPath
+    pushUser:  pushUser,
+    pushCart:  pushCart,
+    pushPage:  pushPage,
+    pushEvent: pushEvent
   };
 })();
