@@ -115,7 +115,7 @@ function renderProductCard(product) {
   return [
     '<article class="product-card" data-product-id="' + product.id + '">',
     '  <a href="/product?id=' + product.id + '" class="product-card-img-wrap" data-link>',
-    '    <img src="' + product.image + '" alt="' + product.name + '" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/600x600/0d1b2a/ffffff?text=GearUp\'" />',
+    '    <img src="' + product.image + '" alt="' + product.name + '" loading="lazy" />',
     '    <span class="product-card-category">' + product.category + '</span>',
     '  </a>',
     '  <div class="product-card-body">',
