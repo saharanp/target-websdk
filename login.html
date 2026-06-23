@@ -6,8 +6,24 @@
   <title>Sign In — GearUp Velocity</title>
   <meta name="description" content="Sign in to GearUp Velocity — demo accounts: runner, trainer, footballer." />
 
-  <!-- ACDL stub — MUST exist before Launch loads so early pushes are captured -->
-  <script>window.adobeDataLayer = window.adobeDataLayer || [];</script>
+  <!-- ACDL stub + early user seed — runs synchronously BEFORE Launch so Target's
+       page-top fetch sees the user object even if DOMContentLoaded hasn't fired. -->
+  <script>
+  (function () {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    try {
+      var user = localStorage.getItem('gu_user');
+      var pref = localStorage.getItem('gu_pref');
+      window.adobeDataLayer.push({
+        user: {
+          loginState: user ? 'authenticated' : 'guest',
+          username: user || null,
+          preference: pref || null
+        }
+      });
+    } catch (e) {}
+  })();
+  </script>
 
   <!-- Adobe Launch (Web SDK / alloy.js) -->
   <script src="https://assets.adobedtm.com/6a203c8a0ff8/1cf8f868f321/launch-b9f030aeef9f-development.min.js" async></script>
