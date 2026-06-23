@@ -1,4 +1,42 @@
 // ---------------------------------------------------------------------------
+// Auth state — persisted to localStorage. Demo only: any password (even blank)
+// is accepted as long as the username matches one of the three demo accounts.
+// ---------------------------------------------------------------------------
+var AUTH_KEY = 'gu_user';
+var DEMO_USERS = ['athlete', 'coach', 'admin'];
+
+function loadUser() {
+  try { return localStorage.getItem(AUTH_KEY) || null; } catch (e) { return null; }
+}
+
+function saveUser(username) {
+  try {
+    if (username) localStorage.setItem(AUTH_KEY, username);
+    else localStorage.removeItem(AUTH_KEY);
+  } catch (e) {}
+}
+
+var currentUser = loadUser();
+
+function signIn(username) {
+  var clean = (username || '').trim().toLowerCase();
+  if (DEMO_USERS.indexOf(clean) === -1) {
+    return { ok: false, error: 'Unknown user. Try: athlete, coach, or admin.' };
+  }
+  currentUser = clean;
+  saveUser(clean);
+  return { ok: true };
+}
+
+function signOut() {
+  currentUser = null;
+  saveUser(null);
+  refreshNavbar();
+  showToast('Signed out');
+  Router.navigate('/');
+}
+
+// ---------------------------------------------------------------------------
 // Cart state — persisted to localStorage so it survives page reloads
 // ---------------------------------------------------------------------------
 var CART_KEY = 'gu_cart';
@@ -62,7 +100,7 @@ function updateCartQty(productId, delta) {
 // Layout helpers
 // ---------------------------------------------------------------------------
 function refreshNavbar() {
-  document.getElementById('navbar-container').innerHTML = renderNavbar(getCartCount());
+  document.getElementById('navbar-container').innerHTML = renderNavbar(getCartCount(), currentUser);
   setActivePage();
 }
 
@@ -365,6 +403,47 @@ function renderAboutPage() {
 }
 
 // ---------------------------------------------------------------------------
+// Page: Login
+// ---------------------------------------------------------------------------
+function renderLoginPage() {
+  document.getElementById('main-content').innerHTML = [
+    '<div class="page-header">',
+    '  <div class="container">',
+    '    <h1 class="page-title">Sign In</h1>',
+    '    <p class="page-subtitle">Demo login — any password (even blank) works.</p>',
+    '  </div>',
+    '</div>',
+    '<section class="section">',
+    '  <div class="container">',
+    '    <div class="login-wrap">',
+    '      <form class="login-form" onsubmit="return App.handleLogin(event)">',
+    '        <label class="login-label">Username',
+    '          <input type="text" id="login-username" class="login-input" placeholder="athlete, coach, or admin" autocomplete="username" />',
+    '        </label>',
+    '        <label class="login-label">Password',
+    '          <input type="password" id="login-password" class="login-input" placeholder="anything (or leave blank)" autocomplete="current-password" />',
+    '        </label>',
+    '        <p id="login-error" class="login-error" style="display:none"></p>',
+    '        <button type="submit" class="btn btn-lg btn-accent" style="width:100%;margin-top:8px">Sign In</button>',
+    '      </form>',
+    '      <div class="login-hint">',
+    '        <h4>Demo accounts</h4>',
+    '        <ul>',
+    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'athlete\')">athlete</button> &mdash; regular shopper</li>',
+    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'coach\')">coach</button> &mdash; team buyer</li>',
+    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'admin\')">admin</button> &mdash; site administrator</li>',
+    '        </ul>',
+    '        <p class="login-hint-note">Password is not validated — this is a demo for Adobe Target audience testing.</p>',
+    '      </div>',
+    '    </div>',
+    '  </div>',
+    '</section>',
+  ].join('\n');
+
+  setActivePage();
+}
+
+// ---------------------------------------------------------------------------
 // Global App namespace — called by inline onclick handlers in component HTML
 // ---------------------------------------------------------------------------
 var App = {
@@ -373,6 +452,26 @@ var App = {
   updateCartQty:   function (id, delta)     { updateCartQty(id, delta); },
   filterShop:      function (category)      { renderShopView(category); },
   showCheckoutMsg: function ()              { showToast('Checkout coming soon! This is a demo site.'); },
+  signOut:         function ()              { signOut(); },
+  fillLogin: function (username) {
+    var u = document.getElementById('login-username');
+    if (u) { u.value = username; u.focus(); }
+  },
+  handleLogin: function (e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var username = (document.getElementById('login-username') || {}).value || '';
+    var result = signIn(username);
+    var err = document.getElementById('login-error');
+    if (!result.ok) {
+      if (err) { err.textContent = result.error; err.style.display = 'block'; }
+      return false;
+    }
+    if (err) err.style.display = 'none';
+    refreshNavbar();
+    showToast('Welcome, ' + currentUser + '!');
+    Router.navigate('/');
+    return false;
+  },
   toggleMenu: function () {
     var menu = document.getElementById('mobile-menu');
     if (menu) menu.classList.toggle('open');
@@ -383,7 +482,7 @@ var App = {
 // Bootstrap
 // ---------------------------------------------------------------------------
 function init() {
-  document.getElementById('navbar-container').innerHTML = renderNavbar(getCartCount());
+  document.getElementById('navbar-container').innerHTML = renderNavbar(getCartCount(), currentUser);
   document.getElementById('target-promo').innerHTML     = renderPromoStrip();
   document.getElementById('footer-container').innerHTML = renderFooter();
 
@@ -392,6 +491,7 @@ function init() {
   Router.register('/product', renderProductPage);
   Router.register('/cart',    renderCartPage);
   Router.register('/about',   renderAboutPage);
+  Router.register('/login',   renderLoginPage);
 
   Router.init();
 }

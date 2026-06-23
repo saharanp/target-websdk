@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Navbar
 // ---------------------------------------------------------------------------
-function renderNavbar(cartCount) {
+function renderNavbar(cartCount, currentUser) {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/shop', label: 'Shop' },
@@ -16,6 +16,17 @@ function renderNavbar(cartCount) {
 
   const mobileCartLabel = cartCount > 0 ? 'Cart (' + cartCount + ')' : 'Cart';
 
+  var authBlock = currentUser
+    ? [
+        '<span class="nav-user">Hi, <strong>' + currentUser + '</strong></span>',
+        '<button class="nav-auth-btn" onclick="App.signOut()">Sign Out</button>',
+      ].join('')
+    : '<a href="/login" class="nav-auth-btn" data-link>Sign In</a>';
+
+  var mobileAuthBlock = currentUser
+    ? '<a href="#" class="nav-link" onclick="App.signOut();return false;">Sign Out (' + currentUser + ')</a>'
+    : '<a href="/login" class="nav-link" data-link>Sign In</a>';
+
   return [
     '<nav class="navbar">',
     '  <div class="navbar-inner container">',
@@ -24,6 +35,7 @@ function renderNavbar(cartCount) {
     '      GearUp <span class="brand-accent">Velocity</span>',
     '    </a>',
     '    <div class="nav-links">' + navLinks + '</div>',
+    '    <div class="nav-auth">' + authBlock + '</div>',
     '    <a href="/cart" class="nav-cart" data-link aria-label="View cart">',
     '      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">',
     '        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>',
@@ -38,6 +50,7 @@ function renderNavbar(cartCount) {
     '  <div class="nav-mobile-menu" id="mobile-menu">',
     '    ' + navLinks,
     '    <a href="/cart" class="nav-link" data-link>' + mobileCartLabel + '</a>',
+    '    ' + mobileAuthBlock,
     '  </div>',
     '</nav>',
   ].join('\n');
