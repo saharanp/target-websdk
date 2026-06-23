@@ -101,14 +101,6 @@ function renderFooter() {
 }
 
 // ---------------------------------------------------------------------------
-// PromoStrip  — id="target-promo" used for Adobe Target audience personalization
-// ---------------------------------------------------------------------------
-function renderPromoStrip(message) {
-  var msg = message || 'Free shipping on orders over $75 &mdash; Use code <strong>GEARUP25</strong> for 25% off your first order';
-  return '<div class="promo-strip"><p>' + msg + '</p></div>';
-}
-
-// ---------------------------------------------------------------------------
 // ProductCard
 // ---------------------------------------------------------------------------
 function renderProductCard(product) {
