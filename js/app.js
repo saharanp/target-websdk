@@ -1,35 +1,53 @@
 // ---------------------------------------------------------------------------
 // Auth state — persisted to localStorage. Demo only: any password (even blank)
 // is accepted as long as the username matches one of the three demo accounts.
+// Each user has a category preference used by Adobe Target audience tests.
 // ---------------------------------------------------------------------------
 var AUTH_KEY = 'gu_user';
-var DEMO_USERS = ['athlete', 'coach', 'admin'];
+var PREF_KEY = 'gu_pref';
+var DEMO_USERS = {
+  runner:     { preference: 'Running' },
+  trainer:    { preference: 'Training' },
+  footballer: { preference: 'Football' },
+};
 
 function loadUser() {
   try { return localStorage.getItem(AUTH_KEY) || null; } catch (e) { return null; }
 }
 
+function loadPref() {
+  try { return localStorage.getItem(PREF_KEY) || null; } catch (e) { return null; }
+}
+
 function saveUser(username) {
   try {
-    if (username) localStorage.setItem(AUTH_KEY, username);
-    else localStorage.removeItem(AUTH_KEY);
+    if (username) {
+      localStorage.setItem(AUTH_KEY, username);
+      localStorage.setItem(PREF_KEY, DEMO_USERS[username].preference);
+    } else {
+      localStorage.removeItem(AUTH_KEY);
+      localStorage.removeItem(PREF_KEY);
+    }
   } catch (e) {}
 }
 
 var currentUser = loadUser();
+var currentPref = loadPref();
 
 function signIn(username) {
   var clean = (username || '').trim().toLowerCase();
-  if (DEMO_USERS.indexOf(clean) === -1) {
-    return { ok: false, error: 'Unknown user. Try: athlete, coach, or admin.' };
+  if (!DEMO_USERS[clean]) {
+    return { ok: false, error: 'Unknown user. Try: runner, trainer, or footballer.' };
   }
   currentUser = clean;
+  currentPref = DEMO_USERS[clean].preference;
   saveUser(clean);
   return { ok: true };
 }
 
 function signOut() {
   currentUser = null;
+  currentPref = null;
   saveUser(null);
   refreshNavbar();
   showToast('Signed out');
@@ -418,7 +436,7 @@ function renderLoginPage() {
     '    <div class="login-wrap">',
     '      <form class="login-form" onsubmit="return App.handleLogin(event)">',
     '        <label class="login-label">Username',
-    '          <input type="text" id="login-username" class="login-input" placeholder="athlete, coach, or admin" autocomplete="username" />',
+    '          <input type="text" id="login-username" class="login-input" placeholder="runner, trainer, or footballer" autocomplete="username" />',
     '        </label>',
     '        <label class="login-label">Password',
     '          <input type="password" id="login-password" class="login-input" placeholder="anything (or leave blank)" autocomplete="current-password" />',
@@ -429,11 +447,11 @@ function renderLoginPage() {
     '      <div class="login-hint">',
     '        <h4>Demo accounts</h4>',
     '        <ul>',
-    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'athlete\')">athlete</button> &mdash; regular shopper</li>',
-    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'coach\')">coach</button> &mdash; team buyer</li>',
-    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'admin\')">admin</button> &mdash; site administrator</li>',
+    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'runner\')">runner</button> &mdash; prefers <strong>Running</strong></li>',
+    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'trainer\')">trainer</button> &mdash; prefers <strong>Training</strong></li>',
+    '          <li><button type="button" class="login-chip" onclick="App.fillLogin(\'footballer\')">footballer</button> &mdash; prefers <strong>Football</strong></li>',
     '        </ul>',
-    '        <p class="login-hint-note">Password is not validated — this is a demo for Adobe Target audience testing.</p>',
+    '        <p class="login-hint-note">Password is not validated &mdash; this is a demo for Adobe Target audience testing.</p>',
     '      </div>',
     '    </div>',
     '  </div>',
