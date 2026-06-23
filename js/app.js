@@ -46,11 +46,16 @@ function signIn(username) {
 }
 
 function signOut() {
+  var prev = currentUser;
   currentUser = null;
   currentPref = null;
   saveUser(null);
   refreshNavbar();
   showToast('Signed out');
+  // User state must update before the page event so the next pageView reflects
+  // guest context.
+  DL.pushUser();
+  DL.pushEvent('userLoggedOut', { username: prev });
   Router.navigate('/');
 }
 
@@ -96,6 +101,8 @@ function addToCart(productId) {
   saveCart();
   refreshNavbar();
   showToast('Item added to cart!');
+  DL.pushCart();
+  DL.pushEvent('cartAdd', { productId: productId });
 }
 
 function removeFromCart(productId) {
@@ -103,6 +110,8 @@ function removeFromCart(productId) {
   saveCart();
   refreshNavbar();
   if (window.location.pathname === '/cart') renderCartPage('');
+  DL.pushCart();
+  DL.pushEvent('cartUpdate', { removed: productId });
 }
 
 function updateCartQty(productId, delta) {
@@ -112,6 +121,8 @@ function updateCartQty(productId, delta) {
   saveCart();
   refreshNavbar();
   if (window.location.pathname === '/cart') renderCartPage('');
+  DL.pushCart();
+  DL.pushEvent('cartUpdate', { productId: productId, quantity: item.quantity });
 }
 
 // ---------------------------------------------------------------------------
@@ -469,7 +480,10 @@ var App = {
   removeFromCart:  function (id)            { removeFromCart(id); },
   updateCartQty:   function (id, delta)     { updateCartQty(id, delta); },
   filterShop:      function (category)      { renderShopView(category); },
-  showCheckoutMsg: function ()              { showToast('Checkout coming soon! This is a demo site.'); },
+  showCheckoutMsg: function ()              {
+    DL.pushEvent('checkoutIntent', { value: getCartTotal(), itemCount: getCartCount() });
+    showToast('Checkout coming soon! This is a demo site.');
+  },
   signOut:         function ()              { signOut(); },
   fillLogin: function (username) {
     var u = document.getElementById('login-username');
@@ -487,6 +501,10 @@ var App = {
     if (err) err.style.display = 'none';
     refreshNavbar();
     showToast('Welcome, ' + currentUser + '!');
+    // User state first; then the userLoggedIn event; then a fresh pageView so
+    // personalization re-evaluates with the new preference.
+    DL.pushUser();
+    DL.pushEvent('userLoggedIn', { username: currentUser, preference: currentPref });
     Router.navigate('/');
     return false;
   },
@@ -511,6 +529,10 @@ function init() {
   Router.register('/about',   renderAboutPage);
   Router.register('/login',   renderLoginPage);
 
+  // Seed user + cart context BEFORE Router.init() fires the first pageView so
+  // the first personalization request carries login/preference state.
+  DL.pushUser();
+  DL.pushCart();
   Router.init();
 }
 

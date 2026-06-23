@@ -21,6 +21,12 @@ const Router = (() => {
     const handler = routes[pathname];
     if (handler) {
       handler(search);
+      // Single pageView per navigation — fired after the new view's DOM is in
+      // place. Filter changes on /shop do NOT pass through here (they call
+      // renderShopView directly), so they intentionally do not re-fire pageView.
+      if (window.DL) {
+        DL.pushPage(DL.nameForPath(pathname), DL.extraForPath(pathname, search));
+      }
     } else {
       navigate('/', true);
     }

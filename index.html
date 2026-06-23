@@ -6,6 +6,9 @@
   <title>GearUp Velocity — Sports Gear &amp; Sportswear</title>
   <meta name="description" content="Premium sports gear, running shoes, training apparel, and football equipment for serious athletes." />
 
+  <!-- ACDL stub — MUST exist before Launch loads so early pushes are captured -->
+  <script>window.adobeDataLayer = window.adobeDataLayer || [];</script>
+
   <!-- Adobe Launch (Web SDK / alloy.js) -->
   <script src="https://assets.adobedtm.com/6a203c8a0ff8/1cf8f868f321/launch-b9f030aeef9f-development.min.js" async></script>
 
@@ -26,8 +29,9 @@
     <footer id="footer-container"></footer>
   </div>
 
-  <!-- Load order: data → router → components → app -->
+  <!-- Load order: data → datalayer → router → components → app -->
   <script src="/js/data.js"></script>
+  <script src="/js/datalayer.js"></script>
   <script src="/js/router.js"></script>
   <script src="/js/components.js"></script>
   <script src="/js/app.js"></script>
