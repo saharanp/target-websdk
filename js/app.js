@@ -49,10 +49,20 @@ function signOut() {
   var prev = currentUser;
   currentUser = null;
   currentPref = null;
-  saveUser(null);
-  // User state + event fire on the current page; the next page's own
-  // bootstrap will fire a fresh pushUser/pushPage in guest context.
-  DL.pushUser();
+  // Explicitly clear BOTH keys. If gu_pref lingers, the head-inline seed
+  // on the next page would push a preference for a logged-out visitor and
+  // Target audiences would still match the previous persona. gu_cart is
+  // intentionally preserved — cart survives logout (standard e-comm).
+  try {
+    localStorage.removeItem('gu_user');
+    localStorage.removeItem('gu_pref');
+  } catch (e) {}
+  // Re-seed the data layer to explicit guest state immediately so any rule
+  // that fires on this page (before the navigation completes) sees guest.
+  window.adobeDataLayer = window.adobeDataLayer || [];
+  window.adobeDataLayer.push({
+    user: { loginState: 'guest', username: null, preference: null }
+  });
   DL.pushEvent('userLoggedOut', { username: prev });
   window.location.href = '/';
 }
